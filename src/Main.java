@@ -2,137 +2,173 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        Scanner _inputFromConsole = new Scanner(System.in);
-        String _string;
-        String _result;
+        Scanner inputFromConsole = new Scanner(System.in);
+        String inputData;
+        Digit digit1 = new Digit();
+        Digit digit2 = new Digit();
+        Digit result = new Digit();
+        StringBuffer mathSign = new StringBuffer();
 
         System.out.println("Введите числа в формате 1 + 2");
-        _string = _inputFromConsole.nextLine();
+        inputData = inputFromConsole.nextLine();
 
-        _result = calk(_string);
+        getComponents(inputData, digit1, digit2, mathSign);
+        calk(mathSign, digit1, digit2, result);
 
         System.out.println("Вывод");
-        System.out.println(_result);
+
+        if (digit1.IsArabic)
+            result.printArabic();
+        else
+            result.printRomanian();
     }
 
-    public static String calk(String _string) {
-        String[] digits;
-        int digit1;
-        int digit2;
-        int result;
-
-        digits = _string.split(" ");
+    public static void getComponents(String str, Digit dj1, Digit dj2, StringBuffer sig) {
+        String[] digits = str.split(" ");
 
         if (digits.length != 3)
-            throw new NullPointerException("Неверный формат  ввода");
+            throw new NullPointerException("Неверный формат ввода");
 
-        digit1 = convertToDigit(digits[0]);
-        digit2 = convertToDigit(digits[2]);
-
-        result = switch (digits[1]) {
-            case ("+") -> addition(digit1, digit2);
-            case ("-") -> subtraction(digit1, digit2);
-            case ("*") -> multiplication(digit1, digit2);
-            case ("/") -> division(digit1, digit2);
-            default -> throw new NullPointerException("Неверный формат действия");
-        };
-
-        return (convertFromDigit(result));
+        convertToDigit(digits[0], dj1);
+        convertToDigit(digits[2], dj2);
+        sig.append(digits[1]); // переводим String в StringBuffer
     }
 
-    public static int addition(int in1, int in2) {
-        if ((in1 > 0 && in1 < 11) && (in2 > 0 && in2 < 11))
-            return in1 + in2;
+    public static void calk(StringBuffer sig, Digit dj1, Digit dj2, Digit res) {
+        if (dj2.IsArabic != dj1.IsArabic)
+            throw new NullPointerException("Числа разных систем");
 
-        if ((in1 > 200 && in1 < 211) && (in2 > 200 && in2 < 211))
-            return ((in1 - 200) + (in2 - 200)) + 200;
+        String tempSig = sig.toString();// переводим StringBuffer в String
 
-        throw new NullPointerException("Числа разных систем");
+        switch (tempSig) {
+            case ("+"):
+                addition(dj1, dj2, res);
+                break;
+            case ("-"):
+                subtraction(dj1, dj2, res);
+                break;
+            case ("*"):
+                multiplication(dj1, dj2, res);
+                break;
+            case ("/"):
+                division(dj1, dj2, res);
+                break;
+            default:
+                throw new NullPointerException("Неверный формат действия");
+        }
     }
 
-    public static int subtraction(int in1, int in2) {
-        if ((in1 > 0 && in1 < 11) && (in2 > 0 && in2 < 11))
-            return in1 - in2;
+    public static void addition(Digit dj1, Digit dj2, Digit res) {
+        res.DigitArabic = dj1.DigitArabic + dj2.DigitArabic;
+    }
 
-        if ((in1 > 200 && in1 < 211) && (in2 > 200 && in2 < 211)) {
-            if (in1 > in2)
-                return ((in1 - 200) - (in2 - 200)) + 200;
+    public static void subtraction(Digit dj1, Digit dj2, Digit res) {
+        if (dj1.IsArabic == true && dj2.IsArabic == true)
+            res.DigitArabic = dj1.DigitArabic - dj2.DigitArabic;
+
+        if (dj1.IsArabic == false && dj2.IsArabic == false) {
+            if (dj1.DigitArabic > dj2.DigitArabic)
+                res.DigitArabic = dj1.DigitArabic - dj2.DigitArabic;
             else
                 throw new NullPointerException("Отрицательное число");
         }
-
-        throw new NullPointerException("Числа разных систем");
     }
 
-    public static int multiplication(int in1, int in2) {
-        if ((in1 > 0 && in1 < 11) && (in2 > 0 && in2 < 11))
-            return in1 * in2;
-
-        if ((in1 > 200 && in1 < 211) && (in2 > 200 && in2 < 211))
-            return ((in1 - 200) * (in2 - 200)) + 200;
-
-        throw new NullPointerException("Числа разных систем");
+    public static void multiplication(Digit dj1, Digit dj2, Digit res) {
+        res.DigitArabic = dj1.DigitArabic * dj2.DigitArabic;
     }
 
-    public static int division(int in1, int in2) {
-        if ((in1 > 0 && in1 < 11) && (in2 > 0 && in2 < 11))
-            return (in1 / in2);
-
-        if ((in1 > 200 && in1 < 211) && (in2 > 200 && in2 < 211))
-            return ((in1 - 200) / (in2 - 200)) + 200;
-
-        throw new NullPointerException("Числа разных систем");
+    public static void division(Digit dj1, Digit dj2, Digit res) {
+        res.DigitArabic = dj1.DigitArabic / dj2.DigitArabic;
     }
 
-    public static int convertToDigit(String str) {
-        return switch (str) {
-            case ("1") -> 1;
-            case ("2") -> 2;
-            case ("3") -> 3;
-            case ("4") -> 4;
-            case ("5") -> 5;
-            case ("6") -> 6;
-            case ("7") -> 7;
-            case ("8") -> 8;
-            case ("9") -> 9;
-            case ("10") -> 10;
+    public static void convertToDigit(String str, Digit dj) {
+        switch (str) {
+            case ("1"):
+                dj.DigitArabic = 1;
+                dj.IsArabic = true;
+                break;
+            case ("2"):
+                dj.DigitArabic = 2;
+                dj.IsArabic = true;
+                break;
+            case ("3"):
+                dj.DigitArabic = 3;
+                dj.IsArabic = true;
+                break;
+            case ("4"):
+                dj.DigitArabic = 4;
+                dj.IsArabic = true;
+                break;
+            case ("5"):
+                dj.DigitArabic = 5;
+                dj.IsArabic = true;
+                break;
+            case ("6"):
+                dj.DigitArabic = 6;
+                dj.IsArabic = true;
+                break;
+            case ("7"):
+                dj.DigitArabic = 7;
+                dj.IsArabic = true;
+                break;
+            case ("8"):
+                dj.DigitArabic = 8;
+                dj.IsArabic = true;
+                break;
+            case ("9"):
+                dj.DigitArabic = 9;
+                dj.IsArabic = true;
+                break;
+            case ("10"):
+                dj.DigitArabic = 10;
+                dj.IsArabic = true;
+                break;
 
-            case ("I") -> 201;
-            case ("II") -> 202;
-            case ("III") -> 203;
-            case ("IV") -> 204;
-            case ("V") -> 205;
-            case ("VI") -> 206;
-            case ("VII") -> 207;
-            case ("VIII") -> 208;
-            case ("IX") -> 209;
-            case ("X") -> 210;
-            default -> throw new NullPointerException("Неверный формат чисел");
-        };
-    }
+            case ("I"):
+                dj.DigitArabic = 1;
+                dj.IsArabic = false;
+                break;
+            case ("II"):
+                dj.DigitArabic = 2;
+                dj.IsArabic = false;
+                break;
+            case ("III"):
+                dj.DigitArabic = 3;
+                dj.IsArabic = false;
+                break;
+            case ("IV"):
+                dj.DigitArabic = 4;
+                dj.IsArabic = false;
+                break;
+            case ("V"):
+                dj.DigitArabic = 5;
+                dj.IsArabic = false;
+                break;
+            case ("VI"):
+                dj.DigitArabic = 6;
+                dj.IsArabic = false;
+                break;
+            case ("VII"):
+                dj.DigitArabic = 7;
+                dj.IsArabic = false;
+                break;
+            case ("VIII"):
+                dj.DigitArabic = 8;
+                dj.IsArabic = false;
+                break;
+            case ("IX"):
+                dj.DigitArabic = 9;
+                dj.IsArabic = false;
+                break;
+            case ("X"):
+                dj.DigitArabic = 10;
+                dj.IsArabic = false;
+                break;
 
-    public static String convertFromDigit(int in) {
-        String result = "";
-
-        if (in < 101) {
-            result = Integer.toString(in);
-            return result;
+            default:
+                throw new NullPointerException("Неверный формат чисел");
         }
-
-        in -= 200;
-
-        int[] arab = {1, 4, 5, 9, 10, 40, 50, 90, 100, 400, 500, 900, 1000};
-        String[] roman = {"I", "IV", "V", "IX", "X", "XL", "L", "XC", "C", "CD", "D", "CM", "M"};
-        int i = arab.length - 1;
-
-        while (in > 0) {
-            if (in >= arab[i]) {
-                result += roman[i];
-                in -= arab[i];
-            } else
-                i--;
-        }
-
-        return result;
     }
+
 }
