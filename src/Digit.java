@@ -12,11 +12,14 @@ public class Digit {
         int i = arab.length - 1;
 
         while (DigitArabic > 0) {
+
             if (DigitArabic >= arab[i]) {
                 DigitRomanian += roman[i];
                 DigitArabic -= arab[i];
-            } else
+            }
+            else {
                 i--;
+            }
         }
     }
 
